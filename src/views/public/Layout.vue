@@ -1,14 +1,21 @@
 <template>
     <div>
-        <h1>Layout</h1>
+        
+        <PublicNav/>
+       
     </div>
     <RouterView />
 </template>
 
 <script>
+import PublicNav from '../../components/PublicNav.vue';
+
 export default{
 
-    name:"layout"
+    name:"layout",
+     components:{
+        PublicNav
+     }
 }
 
 </script>
