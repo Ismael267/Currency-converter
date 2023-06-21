@@ -1,6 +1,5 @@
 <template>
     <div>
-    
         <AdminNav/>
         <button @click="deleteToken">Deconnexion</button>
     </div>
@@ -16,7 +15,7 @@ export default{
     methods:{
     deleteToken() {
       localStorage.removeItem('token');
-      this.$router.push("login")
+      this.$router.push("/")
     }
 }
 }

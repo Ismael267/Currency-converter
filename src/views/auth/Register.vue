@@ -1,4 +1,5 @@
 <template>
+  <div>
     <form @submit.prevent="register">
       <h2>Inscription</h2>
       <div class="form-group">
@@ -23,103 +24,54 @@
       <div v-if="successMessage">{{ successMessage }}</div>
       <div v-if="errorMessage">{{ errorMessage }}</div>
     </form>
-  </template>
-  
+    <button @click="$router.push({name: 'login'})">Aller à la page de connexion</button>
+  </div>
+</template>
+
 <style>
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #ffffff19;
-    padding: 3rem;
-    border-radius: 0.25rem;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  }
-  
-  h2 {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-  }
-  
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 1.5rem;
-  }
-  
-  label {
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  input {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 0.25rem;
-    font-size: 1.2rem;
-    width: 100%;
-    max-width: 25rem;
-  }
-  
-  button {
-    padding: 0.5rem;
-    border: none;
-    border-radius: 0.25rem;
-    background-color: #007aff;
-    color: #fff;
-    font-size: 1.2rem;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
+  /* Styles CSS ici */
 </style>
+
 <script>
-export default{
-    name:"register",
-    data() {
-        return {
-            user: {
-                name:'',
-                email: '',
-                password: '',
-                password_confirmation: '',
-                successMessage: "",
-                errorMessage: "",
-            }
-        }
-    },
-    methods: {
-  register() {
-          fetch('http://127.0.0.1:8000/api/users/register',{
-            headers:{
-              'accept':'applicaton/json',
-              'Content-Type':'application/json'
-            },
-            method:'POST',
-            body:JSON.stringify(this.user)
-          })
-    .then(response => {
-      if (response.ok) {
-        this.successMessage = "Inscription réussie !";
-        this.errorMessage = "";
-      } else {
-        this.successMessage = "";
-        this.errorMessage = "Échec de l'inscription";
+export default {
+  name: "register",
+  data() {
+    return {
+      user: {
+        name: "",
+        email: "",
+        password: "",
+        password_confirmation: "",
+        successMessage: "",
+        errorMessage: ""
       }
-      console.log(response.status);
-      return response.json();
-    })
-    .then(data => console.log(data),
-    this.$router.push({name: 'login'}))
-    .catch(error => console.log(error))
+    };
+  },
+  methods: {
+    register() {
+      fetch("http://127.0.0.1:8000/api/users/register", {
+        headers: {
+          accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        method: "POST",
+        body: JSON.stringify(this.user)
+      })
+        .then(response => {
+          if (response.ok) {
+            this.successMessage = "Inscription réussie !";
+            this.errorMessage = "";
+            this.$router.push({ name: "login" });
+          } else {
+            this.successMessage = "";
+            this.errorMessage = "Échec de l'inscription";
+          }
+          console.log(response.status);
+          return response.json();
+        })
+        .then(data => console.log(data))
+        .catch(error => console.log(error));
+    }
   }
-}
-
-}
-
-
+};
 </script>

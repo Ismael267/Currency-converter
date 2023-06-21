@@ -3,7 +3,8 @@
         <p>Mon menu :</p>
         <nav>
             <RouterLink to="/listePair" class="menu-link">Liste</RouterLink>
-            <RouterLink to="/ajouterPair" class="menu-link">ajouter</RouterLink>
+            <RouterLink to="/ajouterPair" class="menu-link">Ajouter pair</RouterLink>
+            <RouterLink to="/addCurrency" class="menu-link">Ajouter devise</RouterLink>
         </nav>
     </div>
 </template>

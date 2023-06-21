@@ -1,65 +1,93 @@
 <template>
     <div>
-        <h2>Ajouter une paire de devises et son taux</h2>
-        <form @submit.prevent="addCurrencyPair">
-            <label>
-                Paire de devise:
-                <input type="text" v-model="data.pair" required>
-            </label>
-           
-            <label>
-                Taux:
-                <input type="number" v-model="data.rate" step="0.0001" required>
-            </label>
-            <button type="submit">Ajouter</button>
-        </form>
-        <div v-if="data.status">
-            {{ data.status }}
-        </div>
+      <h2>Ajouter une paire de devises et son taux</h2>
+      <form @submit.prevent="addCurrencyPair">
+        <label>
+          Devise de départ:
+          <select v-model="data.currency_from" required>
+            <option v-for="currency in data.currencies" :value="currency.code" :key="currency.id">{{ currency.code }}</option>
+          </select>
+        </label>
+        <label>
+          Devise d'arrivée:
+          <select v-model="data.currency_to" required>
+            <option v-for="currency in data.currencies" :value="currency.code" :key="currency.id">{{ currency.code }}</option>
+          </select>
+        </label>
+        <label>
+          Taux:
+          <input type="number" v-model="data.rate" step="0.0001" required>
+        </label>
+        <button type="submit">Ajouter</button>
+      </form>
+      <div v-if="data.status">
+        {{ data.status }}
+      </div>
     </div>
-</template>
+  </template>
   
-<script>
-export default {
+  <script>
+  export default {
     name: "ajouterPair",
     data() {
-        return {
-            data:{
-                pair: "",
-                rate: null,
-                status: "",
-            }
-        };
+      return {
+        data: {
+          currencies: [],
+          currency_from: "",
+          currency_to: "",
+          rate: null,
+          status: ""
+        }
+      };
     },
     methods: {
-        async addCurrencyPair() {
-            const data = {
-                pair: this.data.pair.toUpperCase(),
-                rate: this.data.rate,
-            };
-            const response = await fetch("http://127.0.0.1:8000/api/currency/add", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
-            if (response.ok) {
-                this.data.status = "La paire de devises a été ajoutée avec succès.";
-                this.data.pair = "";
-                this.data.rate = null;
-                this.$router.push({name:'listePair'})
-            } else {
-                this.data.status = "Une erreur est survenue lors de l'ajout de la paire de devises.";
-            }
-        },
+      async addCurrencyPair() {
+        const data = {
+          currency_from: this.data.currency_from,
+          currency_to: this.data.currency_to,
+          rate: this.data.rate
+        };
+        console.log(data);
+        const response = await fetch("http://127.0.0.1:8000/api/pairs/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        });
+        if (response.ok) {
+           
+          this.data.status = "La paire de devises a été ajoutée avec succès.";
+          this.data.currency_from = "";
+          this.data.currency_to = "";
+          this.data.rate = null;
+          this.$router.push({ name: "listePair" });
+        } else {
+          this.data.status = "Une erreur est survenue lors de l'ajout de la paire de devises.";
+          console.log(response)
+        }
+      }
     },
-};
-</script>
+    mounted() {
+      fetch("http://127.0.0.1:8000/api/currency/list", {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        method: "GET"
+      })
+        .then(response => response.json())
+        .then(data => {
+          this.data.currencies = data.currency;
+          console.log(data.currency);
+        });
+    }
+  };
+  </script>
   
-<style>
-/* Style pour le formulaire */
-form {
+  <style>
+  /* Style pour le formulaire */
+  form {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -100,12 +128,12 @@ form {
   }
   
   /* Style pour le message de statut */
-  div[v-if="status"] {
+  div[v-if="data.status"] {
     margin-top: 1rem;
     padding: 0.5rem;
     border: 1px solid gray;
     border-radius: 0.25rem;
     background-color: #e5e5e5;
   }
+  </style>
   
-</style>

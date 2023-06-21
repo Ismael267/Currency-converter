@@ -12,8 +12,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(pair ) in currencyPairs" :key="pair.id">
-            <td>{{ pair.pair }}</td>
+          <tr v-for="pair in currencyPairs" :key="pair.id">
+            <td>{{ pair.currency_from }} - {{ pair.currency_to }}</td>
             <td>{{ pair.rate }}</td>
             <td>
               <button @click="editPair(pair.id)">Editer</button>
@@ -28,7 +28,6 @@
   </div>
 </template>
 
-  
 <style>
 .currency-table {
   margin: 20px;
@@ -56,7 +55,7 @@ tbody tr:nth-child(even) {
   background-color: #f2f2f20f;
 }
 </style>
-  
+
 <script>
 export default {
   name: "listePair",
@@ -67,45 +66,63 @@ export default {
   },
   methods: {
     deletePair(index) {
-      fetch(`http://127.0.0.1:8000/api/currency/delete/${index}`, {
+      fetch(`http://127.0.0.1:8000/api/pairs/delete/${index}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
       })
-        .then((response) => response.json())
+        .then((response) => {
+          console.log(response);
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Une erreur est survenue lors de la suppression de la paire de devises.");
+          }
+        })
         .then((data) => {
           // Recharger la liste des paires de devises après la suppression
-          this.reloadPage();
+          this.fetchCurrencyPairs();
           console.log(data);
         })
         .catch((error) => {
           console.log(error);
         });
-      // console.log(index);
     },
     editPair(index) {
-      console.log(index)
-      this.$router.push("/editerPair/")
+      // console.log(index);
+      this.$router.push("/editerPair");
     },
-    reloadPage() {
-      // Recharge la page actuelle
-      location.reload();
+    fetchCurrencyPairs() {
+  const storedCSRFToken = localStorage.getItem('token');
+
+  fetch("http://127.0.0.1:8000/api/pairs/list", {
+    headers: {
+      accept: "application/json",
+      "Content-Type": "application/json",
+      "X-XSRF-TOKEN": storedCSRFToken,
     },
+    method: "GET",
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error(`Une erreur est survenue lors du chargement des paires de devises. ${response.status}: ${response.statusText}`);
+      }
+    })
+    .then((data) => {
+      this.currencyPairs = data.pairs;
+      console.log(data);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
 
   },
   mounted() {
-    fetch("http://127.0.0.1:8000/api/currency/liste", {
-      headers: {
-        accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      method: "GET",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        this.currencyPairs = data.data;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    this.fetchCurrencyPairs();
   },
 };
 </script>

@@ -1,10 +1,10 @@
 <template>
   <div class="converter">
     <select class="converter__select" v-model="selectedPair">
-      <option v-for="(pair, index) in pairs" :value="pair.id" :key="index">{{ pair.pair }}</option>
+      <option v-for="pair in pairs" :value="pair.id" :key="pair.id">{{ pair.currency_from }} - {{ pair.currency_to }}</option>
     </select>
     <input class="converter__input" v-model="amount" type="number" placeholder="Montant" />
-    <button class="converter__button" @click="convert()">Convertir</button>
+    <button class="converter__button" @click="convert">Convertir</button>
     <p class="converter__result">{{ result }}</p>
   </div>
 </template>
@@ -14,13 +14,13 @@ export default {
   data() {
     return {
       pairs: [],
-      selectedPair: '',
+      selectedPair: 0,
       amount: '',
       result: '',
     };
   },
   mounted() {
-    fetch('http://127.0.0.1:8000/api/currency/liste', {
+    fetch('http://127.0.0.1:8000/api/pairs/list', {
       headers: {
         'accept': 'application/json',
         'Content-Type': 'application/json'
@@ -29,25 +29,36 @@ export default {
     })
       .then(response => response.json())
       .then(data => {
-        this.pairs = data.data;
-        this.selectedPair = this.pairs[0].id;
-        console.log(this.selectedPair)
+        this.pairs = data.pairs;
+        
       });
   },
   methods: {
     convert() {
-      fetch(`http://127.0.0.1:8000/api/currency/show/${this.selectedPair}`,{
+      const selectedPair = this.pairs.find(pair => pair.id === this.selectedPair);
+      if (!selectedPair) {
+        return;
+      }
+
+      const requestData = {
+        currency_from: selectedPair.currency_from,
+        currency_to: selectedPair.currency_to,
+        amount: this.amount
+      };
+console.log(requestData);
+      fetch('http://127.0.0.1:8000/api/pairs/convert', {
         headers: {
-          'accept': 'application/json',
+          'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        method: 'GET'
+        method: 'POST',
+        body: JSON.stringify(requestData)
       })
         .then(response => response.json())
         .then(data => {
-          console.log(data.data.rate)
-          const rate = data.data.rate;
-          this.result = (rate * this.amount);
+          console.log(data)
+          const convertedValue = data.converted_amount;
+          this.result = convertedValue.toFixed(2); // Afficher la valeur convertie avec 2 décimales
         });
     },
   },

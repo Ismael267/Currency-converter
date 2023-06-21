@@ -7,6 +7,7 @@ import calcul from "../views/public/Calcul.vue"
 import ajouterPair from "../views/admin/AjouterPair.vue"
 import listePair from "../views/admin/ListePair.vue"
 import editerPair from "../views/admin/EditerPair.vue"
+import addCurrency from "../views/admin/AddCurrency.vue"
 import adminLayout from "../views/admin/AdminLayout.vue"
 import register from"../views/auth/Register.vue"
 import login from"../views/auth/Login.vue"
@@ -59,6 +60,11 @@ const router = createRouter({
           path: '/listePair',
           name: 'listePair',
           component: listePair
+        },
+        {
+          path: '/addCurrency',
+          name: 'addCurrency',
+          component: addCurrency
         },
       
       ]
